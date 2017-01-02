@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Approval - Handy</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Approval";
+    var mkdocs_page_input_path = "approval.md";
+    var mkdocs_page_url = "/approval/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Handy</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../ref/">Ref</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../refmany/">RefMany</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../latch/">Latch</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../refcache/">RefCache</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../id/">Ids</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Approval</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#approval">Approval</a></li>
+                
+                    <li><a class="toctree-l4" href="#prior">prior</a></li>
+                
+                    <li><a class="toctree-l4" href="#approvals-and-asynchronicity">Approvals and asynchronicity</a></li>
+                
+                    <li><a class="toctree-l4" href="#permission-equality">Permission equality</a></li>
+                
+                    <li><a class="toctree-l4" href="#permonid">Perm.onId</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Handy</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Approval</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="approval">Approval</h1>
+<p>Handy includes a simple but surprisingly useful permissions system.</p>
+<p>Imagine your request is a small schoolchild. And it needs to collect permission slips for what it wants to do. Sometimes, the teachers might look at the permission slips the child has already got, and say "well, if you're allowed to play soccer, of course you're allowed to get a football".</p>
+<p><code>Approval[U]</code> works like a little wallet for permission slips. <code>U</code> is your user type, and it contains a Ref to its owner:</p>
+<pre><code class="scala">case class Approval[U](val who: Ref[U]) { 
+    //...
+}
+</code></pre>
+
+<p><code>Perm</code> is a permission. It is a trait with a single method:</p>
+<pre><code class="scala">trait Perm[U] {
+  def resolve(prior: Approval[U]):Ref[Approved]
+}
+</code></pre>
+
+<p><code>Approved</code> is a type that represents a permission has been approved, and <code>Refused</code> is a Throwable to represent that something has not been approved. So:</p>
+<pre><code class="scala">for { 
+    a &lt;- approval ask SomePermission 
+} yield doSomething()
+</code></pre>
+
+<p><code>doSomething()</code> will only occur if the permission is approved, and otherwise the result will be <code>RefFailed(Refused(message))</code>.</p>
+<h2 id="prior">prior</h2>
+<p>The <code>resolve</code> method takes a parameter called <code>prior: Approval[U]</code> so that the method (the permissions check) can use what permissions you've already been granted when making its determination.</p>
+<pre><code class="scala">def resolve(prior: Perm[User]) = {
+  // If the user is an administrator, we don't need to check any further
+  (prior ask CanAdminister) recoverWith { case Refused(_) =&gt; 
+    // ... ok, they're not an admin so we ought to check...
+  } 
+}
+</code></pre>
+
+<p>And because we usually test permissions with</p>
+<pre><code class="scala">approval ask permission
+</code></pre>
+
+<p>and approval has a cache of permissions already granted, it will automatically check if it's already been granted a permission. The permissions wallet uses a ConcurrentHashMap, so entries can be invalidated. </p>
+<p>If you want to check a permission without caching (for example, for time-sensitive checks on the client), there's two ways of doing that which are equivalent:</p>
+<pre><code class="scala">permission.resolve(approval)
+
+approval askAfresh permission
+</code></pre>
+
+<p>Usually on the server, the lifetime of an Approval (a permissions wallet) is short -- a single request, while on the client it may be longer (while the user is logged in).</p>
+<h2 id="approvals-and-asynchronicity">Approvals and asynchronicity</h2>
+<p>The return type of <code>resolve</code> is <code>Ref[Approved]</code>. So it <em>might</em> be asynchronous. This means your permissions check can also go and look things up. "You may only edit your assignment submission if it is <em>your</em> assignment submission and the due date for that assignment has not passed". </p>
+<pre><code class="scala">def resolve(prior: Perm[User]) = for {
+    user       &lt;- prior.who
+    s          &lt;- submission if s.submittedBy == user.id
+                  orIfNone Refused(&quot;This isn't your assignment&quot;)
+    assignment &lt;- s.assignmentId.lookUp(lu) if assignment.due &gt; getTime() 
+                  orIfNone Refused(&quot;Assignment is past due&quot;)
+} yield Approved(&quot;Yes you can edit it&quot;)
+</code></pre>
+
+<h2 id="permission-equality">Permission equality</h2>
+<p>Usually, we want a permission's equality to be based around the ID of an object, not the object itself. </p>
+<p>Consider a request to the server to edit a user's profile.
+- The ID will remain the same
+- Some fields of the object will change</p>
+<p>So in a request to edit a record it is usually the case that <code>submittedRecord.id == originalRecord.id</code> but <code>submittedRecord != originalRecord</code>. (Assuming you've written your business objects as case classes.) But we don't want "permission to edit the submitted record" and "permission to edit the original record" to be different items because conceptually they are permission to edit <em>that</em> user's profile.</p>
+<h2 id="permonid">Perm.onId</h2>
+<p>It is entirely reasonable for a permission to be a case class on an ID. For example:</p>
+<pre><code class="scala">case class CanEditCourse(id:Id[Course, String]) extends Perm[User] {
+  def resolve(p:Prior[User]) = ???
+}
+</code></pre>
+
+<p>But you might want it to work so that you can also pass in the <code>Course</code> itself if you have it, so that <code>resolve</code> doesn't try to look it up from the database again. So, perhaps you would like your permission to do its equality-check based on the ID of an item, but be happy receiving any kind a <code>Ref</code>, whether it's a <code>LazyId</code> or a <code>RefItself</code> or a <code>RefFuture</code>.</p>
+<p>Handy includes a little generator method <code>Perm.onId[U, T, K]</code> that is useful for these cases. <code>U</code> is your user type, <code>T</code> is the item type, and <code>K</code> is the key type. It requires an implicit <code>GetsId[T, K]</code>, because it needs to know how to extract the ID from the item.</p>
+<pre><code class="scala">  val EditTask = Perm.onId[User, Task, String] { case (prior, refTask) =&gt;
+    for (
+        t &lt;- refTask;
+        a &lt;- prior ask EditCourse(t.course)
+    ) yield a
+  }
+</code></pre>
+
+<p>And then <code>EditTask(getUser(3)) == EditTask(user3.itself)</code></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../id/" class="btn btn-neutral" title="Ids"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../id/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+site_name: Handy
+docs_dir: source_docs
+site_dir: docs
+pages:
+    - Home: index.md
+    - Ref: ref.md
+    - RefMany: refmany.md
+    - Latch: latch.md
+    - RefCache: refcache.md
+    - Ids: id.md
+    - Approval: approval.md
+theme: readthedocs

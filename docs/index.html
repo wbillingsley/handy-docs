@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  <link rel="shortcut icon" href="./img/favicon.ico">
+  <title>Home - Handy</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="./css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/";
+  </script>
+  
+  <script src="./js/jquery-2.1.1.min.js"></script>
+  <script src="./js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="./js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> Handy</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href=".">Home</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#handy">Handy</a></li>
+                
+                    <li><a class="toctree-l4" href="#whats-the-philosophy-behind-all-this">What's the philosophy behind all this</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="ref/">Ref</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="refmany/">RefMany</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="latch/">Latch</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="refcache/">RefCache</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="id/">Ids</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="approval/">Approval</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">Handy</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="handy">Handy</h1>
+<p>Handy is a small library of Scala classes to make asynchronous, lazy, reactive programming concise and easy for the web -- both in the browser (Scala.js) and on the server (Scala on the JVM). Rather than
+make everything reactive (like other frameworks that use the observer pattern throughout), it tries to make reactive programming <em>lazy</em> -- only be reactive when it needs to be, and otherwise just look like
+function calls.</p>
+<p>It also includes classes I find commonly useful for implementing web systems, for example typed IDs, and a simple asynchonrous permissions system. This makes it possible, for instance, to write
+permission logic that can be run transparently in the browser or on the server.</p>
+<p>Programs using handy usually make heavy use of Scala's for-comprehension style. Suppose we want to organise a surprise birthday party for a bot called Algernon, from the bots it normally interacts with...</p>
+<pre><code class="scala">val invitees:RefMany[Bot] = for {
+  canGetFriends &lt;- approval ask CanLookupFriends(Algernon)
+  friend &lt;- socialNetwork.friends(Algernon).take(10)
+  canMessage &lt;- approval ask CanSendNotificationTo(friend)
+  sent &lt;- invite(friend) if (sent.successful)
+} yield friend
+</code></pre>
+
+<p>And we'll get an asynchronous list of those friends from Algernon's top 10 best friends who we were allowed to send an invite notification to. </p>
+<p>Note that this for-comprehension translates to a sequence of flatMap and map calls, and it can be asynchronous. For example, looking up the friends is probably an asynchonrous call. As, often, are the
+permissions checks.</p>
+<p>Its only dependency is on the interface of the Reactive-Streams standard, so that it can produce and consume reactive streams.</p>
+<h2 id="whats-the-philosophy-behind-all-this">What's the philosophy behind all this</h2>
+<p>Really, the library was written from a philosophy of "maximum indecisiveness". </p>
+<p>I'd written a few apps that I'd needed to migrate between web frameworks, and between styles of database (SQL or NoSQL). And it irked me how much of the model of an app depended on the framework it used. For 
+example, who can do what is a business decision -- that should be part of the model code, not an annotation on an HTTP controller.</p>
+<p>So I tried to write a little library that makes as few assumptions as possible, and lets decisions happen as late as possible. It is designed for programs that run on the Web -- either in the browser 
+or on the server, so you can delay deciding where something will be calculated too. So it was designed through thinking fairly abstractly and unopinionatedly about programming for networked environments.</p>
+<h3 id="network-programming-in-general">Network programming in general</h3>
+<p>When writing servers that need to talk to services and databases, or clients that need to talk to servers, we tend to load data only when we need it, and when we go to fetch it:</p>
+<ul>
+<li>it might take some time (asynchronous)</li>
+<li>it might fail</li>
+<li>it might not be there</li>
+</ul>
+<p>You could describe that as a <code>Future[Option[T]]</code>, but actually that'd be a bit painful because it's a nested type. Calling <code>map</code> would let you work with the Option inside the Future, but then you'd need to call <code>map</code> again to 
+work with the contained value. I'll let your imagination do the rest, but <code>Future[Option[T]]</code> does not compose well if you're trying to write an algorithm more than a few steps long.</p>
+<p>Instead let's call our hypothetical type <code>Ref[T]</code>, and say it has those properties. It <em>might</em> be asynchronous. It <em>might</em> fail. It <em>might</em> produce nothing.</p>
+<p>Instead of backing this type with a <code>Future[Option[T]]</code>, or some other specific structure, handy makes <code>Ref[T]</code> a trait.
+So that for instance we can have <code>RefItself[T]</code> if actually it turns out you've already got the object in your hands.
+The principle here is about being lazy about converting anything. If you are writing an HTTP controller, then at the end of your algorithm, you will probably need to give your web framework a type it understands -- probably something like <code>Future[Result]</code>.
+But until the end, each step in your algorithm can just talk about a <code>Ref[This]</code> and <code>Ref[That]</code>.</p>
+<p>In the case of a single value, that might seem a bit trivial, but this also lets us be very composable. Especially when we bring in <code>RefMany[T]</code> -- a reference to many things.
+A <code>RefMany[T]</code> could be an array of things. It could be a reactive stream. It could be an array of <code>Ref[T]</code>s. It could be an array-of-refs-of-arrays-of-reactive-streams-of-futures. 
+Until we spit it out at the end, our algorithm doesn't have to care -- it's just a possibly-asynchronous reference to many things of type <code>T</code>. At the end, we'll usually decide to output the result as a 
+reactive stream. But we can be lazy about that and only convert to a reactive stream when we need to -- along the way we can let the different kinds of <code>RefMany[T]</code> (those backed by arrays, or streams, 
+or arrays of <code>Ref[T]</code>s, etc) compose naturally.</p>
+<h3 id="the-browser-environment">The browser environment</h3>
+<p>In the browser, we don't usually want all the information about our app, just enough to display the UI and take actions as needed. Information gets loaded on demand. JavaScript is single-threaded, but calls
+to the server can involve significant latency.</p>
+<p>So, we have an environment where we want to be:</p>
+<ul>
+<li>lazy </li>
+<li>asynchronous</li>
+<li>reactive (cache some information, but react to changes)</li>
+</ul>
+<p>But there's not actually going to be a high degree of concurrency (JavaScript is a mostly single-threaded environment). </p>
+<h3 id="the-server-environment">The server environment</h3>
+<p>In the server, we're usually responding to a request made by the client. Things happen asynchronously, because we may need to talk to databases and other systems. And we may need to fetch values along the way,
+that might be used in several steps of the processing.</p>
+<p>So, we have an environment where we want to be:</p>
+<ul>
+<li>lazy </li>
+<li>asynchronous</li>
+<li>reactive (because sometimes we have a websocket / persistent connection and want to stream out events)</li>
+</ul>
+<p>But we tend not to share variables between requests (at least not mutable ones), so the individual variables within a request won't see a high degree of concurrency. The server itself will -- lots of requests
+going on at once, but they won't be sharing many variables.</p>
+<p>The upshot of which is it's not too much of a stretch to make the same abstractions work in both environments.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ref/" class="btn btn-neutral float-right" title="Ref">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="ref/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="./js/theme.js"></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 0.16.0
+Build Date UTC : 2017-01-02 04:19:21
+-->

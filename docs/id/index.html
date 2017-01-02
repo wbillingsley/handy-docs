@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Ids - Handy</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Ids";
+    var mkdocs_page_input_path = "id.md";
+    var mkdocs_page_url = "/id/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> Handy</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="..">Home</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../ref/">Ref</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../refmany/">RefMany</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../latch/">Latch</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../refcache/">RefCache</a>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 current">
+        <a class="current" href="./">Ids</a>
+        
+            <ul>
+            
+                <li class="toctree-l3"><a href="#ids">Ids</a></li>
+                
+                    <li><a class="toctree-l4" href="#idt-k">Id[T, K]</a></li>
+                
+                    <li><a class="toctree-l4" href="#idst-k">Ids[T, K]</a></li>
+                
+                    <li><a class="toctree-l4" href="#lookup">LookUp</a></li>
+                
+                    <li><a class="toctree-l4" href="#lazyid">LazyId</a></li>
+                
+                    <li><a class="toctree-l4" href="#refid-and-getsid">refId and GetsId</a></li>
+                
+            
+            </ul>
+        
+    </li>
+<li>
+          
+            <li>
+    <li class="toctree-l1 ">
+        <a class="" href="../approval/">Approval</a>
+        
+    </li>
+<li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">Handy</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Ids</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="ids">Ids</h1>
+<p>Handy includes a few classes for dealing with IDs of things, getting them, caching them etc. They are all fairly simple and unexciting. </p>
+<h2 id="idt-k">Id[T, K]</h2>
+<p>Handy includes a typed Id class: <code>Id[T, K]</code>. </p>
+<p>Suppose you are writing an application that uses <a href="https://github.com/twitter/snowflake">Snowflake</a> for its IDs. You may wish to serialise those IDs always as Strings between the server and the client. But in your code, keeping it as an <code>Id[Person, String]</code> has some advantages:</p>
+<ul>
+<li>If you want to serialise them as a different type into the database -- for example, store them there as numbers, you can tell a string from a string-representing-an-ID by its type.</li>
+<li>As the ID is also typed by what it is an ID for (this is a person's ID not a booking ID), the compiler can catch cases of assigning the wrong ID variable.</li>
+</ul>
+<h2 id="idst-k">Ids[T, K]</h2>
+<p>Handy also includes a class for a sequence of IDs: <code>Ids[T, K]</code>. If you have a bunch of IDs you want to look up, you probably want to do them in batch rather than one at a time. </p>
+<p>Converting between <code>Seq[Id[T,K]</code> and <code>Ids[T, K]</code> is fairly straightforward:</p>
+<pre><code class="scala">import Id._
+import Ids._
+
+val seqIds:Seq[Id[Foo, Int]] = Seq(1.asId[Foo], 2.asId[Foo], 3.asId[Foo])
+val ids:Ids[Foo, Int] = seqIds.asIds
+ids.toSeqId == seqIds
+</code></pre>
+
+<h2 id="lookup">LookUp</h2>
+<p>A <code>LookUp</code> knows how to look up an <code>Id</code> or <code>Ids</code>. It is a very simple trait:</p>
+<pre><code class="scala">trait LookUp[T, -K] {
+
+  def one[KK &lt;: K](r:Id[T,KK]): Ref[T]
+
+  def many[KK &lt;: K](r:Ids[T,KK]): RefMany[T]
+
+}
+</code></pre>
+
+<h2 id="lazyid">LazyId</h2>
+<p>LazyId allows a very particular case of indecisiveness -- it lets you be indecisive about whether you want an object or just its ID.</p>
+<p>Suppose you wanted to describe a permissions check on whether a user can edit a page. Do you define that function to accept the page itself, or the ID of the page? It might be that when you start writing your app, your check is "actually, any user can edit pages", and later on you need to lock it down. </p>
+<p>With handy, you just define your function as accepting a <code>Ref[Page]</code>. A <code>LazyId</code> is a pair of the ID and a LookUp. So if the function needs to look up the item, it can. But if it just needs to pull out the ID, it happens immediately without fetching from the database.</p>
+<pre><code class="scala">def canEditPage(p:Ref[Page], u:Ref[User]):Ref[Boolean] = {
+  // An unusual permission rule, but if you've passed in a LazyId, this won't try to fetch the item
+  // but if you've passed in any other kind of Ref[Page] it'll still work
+  for {
+      pId &lt;- p.refId
+  } yield if (pId &gt; 1000) true else false   
+}
+</code></pre>
+
+<p>That might sound a bit obscure, but in the permissions system it turns out to be useful because
+sometimes you'll have rules like "if they can edit the whole book, we don't need to fetch the page
+because they're allowed to edit anything within it".</p>
+<h2 id="refid-and-getsid">refId and GetsId</h2>
+<p>Suppose we have a <code>Ref[User]</code> and want to get its ID. Well, if it is a <code>RefItself[User]</code> (we have the user itself), we can get it from the <code>User</code> object. And if it's a <code>LazyId[User, _]</code> and we haven't fetched the user at all yet, we can just get if from the LazyId. But what if it's a request in-flight -- a <code>RefFuture[User]</code> and the future hasn't completed yet? Well, we'll have to get it asynchronously when the <code>Future</code> has completed. So, <code>refId</code> returns <code>Ref[K]</code> because it <em>might</em> have to be asynchronous.</p>
+<p>What if we have a <code>Ref[String]</code> and call <code>.refId</code> on it? Well, a String doesn't have an ID, so we'd rather make that a compile error because it doesn't make sense to do that. To tell the difference between things that have IDs and things that don't, <code>refId</code> takes an implicit <code>GetsId</code> parameter that knows how to get the ID from the object. It has a fairly simple type:</p>
+<pre><code class="scala">trait GetsId[-T, K] {
+  def getId[TT &lt;: T](obj: TT): Option[Id[TT, K]]
+
+  def canonical[TT &lt;: T](o:Any):Option[Id[TT,K]]
+}
+</code></pre>
+
+<p>The <code>canonical</code> method is needed because the compiler can't know if <code>LazyId</code> uses exactly the same key type that <code>GetsId</code> wants to produce. If the compiler is given a <code>Ref[T]</code> there's no way for it to be sure that the <code>K</code>s in a <code>LazyId[T, K]</code> and a <code>GetsId[T, K]</code> will always be the same. They just usually are.</p>
+<p>If your type implements <code>HasId[T]</code>, there will be one already implicitly in scope.</p>
+<pre><code class="scala">
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../approval/" class="btn btn-neutral float-right" title="Approval">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../refcache/" class="btn btn-neutral" title="RefCache"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../refcache/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../approval/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
